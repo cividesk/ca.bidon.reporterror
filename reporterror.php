@@ -353,6 +353,11 @@ function reporterror_civicrm_generatereport($site_name, $vars, $redirect_path, $
 function reporterror_civicrm_send_mail($to, $subject, $output) {
   $email = '';
 
+  // only send notification for DB errors
+  $match = "DB Error";
+  if (strpos($subject, $match) == false) {
+    return;
+  }
   $result = civicrm_api('OptionValue', 'get', array('option_group_name' => 'from_email_address', 'is_default' => TRUE, 'version' => 3));
 
   if ($result['is_error']) {
