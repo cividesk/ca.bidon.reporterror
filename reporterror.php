@@ -171,7 +171,7 @@ function reporterror_civicrm_handler($vars, $options_overrides = array()) {
   $arg = explode('/', $_GET[$urlVar]);
 
   // Redirect for Contribution pages without a referrer (close / restore browser page)
-  if ($arg[0] == 'civicrm' && $arg[1] == 'contribute' && $arg[2] == 'transact' && ! $_SERVER['HTTP_REFERER']) {
+  if ($arg[0] == 'civicrm' && $arg[1] == 'contribute' && $arg[2] == 'transact' && ! $_SERVER['HTTP_REFERER'] && $_SERVER['REQUEST_METHOD'] != 'HEAD') {
     $handle = reporterror_setting_get('noreferer_handle', $options_overrides);
     $pageid = reporterror_setting_get('noreferer_pageid', $options_overrides);
     $sendreport = reporterror_setting_get('noreferer_sendreport', $options_overrides, 1);
@@ -181,6 +181,18 @@ function reporterror_civicrm_handler($vars, $options_overrides = array()) {
     }
     elseif ($handle == 2) {
       $redirect_path = CRM_Utils_System::url('civicrm/contribute/transact', 'reset=1&id=' . $pageid);
+    }
+  }
+  elseif ($arg[0] == 'civicrm' && $arg[1] == 'event' && ! $_SERVER['HTTP_REFERER'] && $_SERVER['REQUEST_METHOD'] != 'HEAD') {
+    $handle = reporterror_setting_get('noreferer_handle_event', $options_overrides);
+    $pageid = reporterror_setting_get('noreferer_handle_eventid', $options_overrides);
+    $sendreport = reporterror_setting_get('noreferer_sendreport_event', $options_overrides, 1);
+
+    if ($handle == 1 || ($handle == 2 && ! $pageid)) {
+      $redirect_path = CRM_Utils_System::baseCMSURL();
+    }
+    elseif ($handle == 2) {
+      $redirect_path = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $pageid);
     }
   }
 
